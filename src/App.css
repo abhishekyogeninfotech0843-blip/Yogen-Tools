@@ -9,7 +9,7 @@ html {
 
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: 0;
   overflow-x: clip;
   font-family:
     Inter,
@@ -249,6 +249,7 @@ button:disabled {
     flex: 1 1 100%;
     justify-content: space-between;
     width: 100%;
+    max-width: none;
   }
 }
 
@@ -2165,6 +2166,16 @@ button:disabled {
     gap: 0;
   }
 
+  .custom-fields-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .custom-fields-heading .add-item-button {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
   .form-required-option {
     margin: -5px 0 14px;
     padding: 0;
@@ -2645,7 +2656,10 @@ button:disabled {
   }
 
   .top-nav {
+    position: relative;
     width: 100%;
+    max-width: none;
+    flex: 1 1 100%;
     justify-content: space-between;
   }
 
@@ -2667,7 +2681,13 @@ button:disabled {
 
   .tools-dropdown {
     top: calc(100% + 8px);
-    right: -70px;
+    right: 0;
+    left: 0;
+    width: auto;
+  }
+
+  .top-nav-tools {
+    position: static;
   }
 
   .home-feature-row {

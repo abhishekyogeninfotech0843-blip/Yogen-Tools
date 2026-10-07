@@ -809,6 +809,7 @@ function App() {
     setPdfTextStatus("loading");
 
     let pdfDocument;
+    let pdfLoadingTask;
 
     try {
       const [pdfjsLib, pdfWorker] = await Promise.all([
@@ -817,9 +818,10 @@ function App() {
       ]);
       pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker.default;
       const pdfData = new Uint8Array(await file.arrayBuffer());
-      pdfDocument = await pdfjsLib.getDocument({
+      pdfLoadingTask = pdfjsLib.getDocument({
         data: pdfData,
-      }).promise;
+      });
+      pdfDocument = await pdfLoadingTask.promise;
       const pages = [];
 
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
@@ -873,7 +875,8 @@ function App() {
         );
       }
 
-      await pdfDocument.destroy();
+      await pdfLoadingTask.destroy();
+      pdfLoadingTask = null;
       pdfDocument = null;
       setExtractedPdfText(result);
       setPdfTextStatus("done");
@@ -884,9 +887,9 @@ function App() {
         error.message ||
           "Unable to read this PDF. It may be damaged or password-protected.",
       );
-      if (pdfDocument) {
+      if (pdfLoadingTask) {
         try {
-          await pdfDocument.destroy();
+          await pdfLoadingTask.destroy();
         } catch (cleanupError) {
           console.error("PDF WORKER CLEANUP ERROR:", cleanupError);
         }
@@ -1170,6 +1173,7 @@ function App() {
 
     let worker;
     let pdfDocument;
+    let pdfLoadingTask;
     setScannedPdfStatus("loading");
     setScannedPdfProgress(0);
     setScannedPdfError("");
@@ -1181,9 +1185,10 @@ function App() {
         import("tesseract.js"),
       ]);
       pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker.default;
-      pdfDocument = await pdfjsLib.getDocument({
+      pdfLoadingTask = pdfjsLib.getDocument({
         data: new Uint8Array(await scannedPdfFile.arrayBuffer()),
-      }).promise;
+      });
+      pdfDocument = await pdfLoadingTask.promise;
 
       if (pdfDocument.numPages > 25) {
         throw new Error(
@@ -1249,7 +1254,8 @@ function App() {
         );
       }
 
-      await pdfDocument.destroy();
+      await pdfLoadingTask.destroy();
+      pdfLoadingTask = null;
       pdfDocument = null;
       setScannedPdfText(resultText);
       setScannedPdfStatus("done");
@@ -1261,9 +1267,9 @@ function App() {
         error.message ||
           "Unable to scan this PDF. It may be damaged or password-protected.",
       );
-      if (pdfDocument) {
+      if (pdfLoadingTask) {
         try {
-          await pdfDocument.destroy();
+          await pdfLoadingTask.destroy();
         } catch (cleanupError) {
           console.error("PDF WORKER CLEANUP ERROR:", cleanupError);
         }
